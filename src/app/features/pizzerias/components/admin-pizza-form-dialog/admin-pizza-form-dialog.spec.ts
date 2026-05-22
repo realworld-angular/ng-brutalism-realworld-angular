@@ -9,7 +9,7 @@ import { FormValueControl, FormField, FormRoot, ValidationError } from '@angular
 import { Pizza } from '../../models/pizza.models';
 import { Button } from '../../../../shared/components/button/button';
 import { Callout } from '../../../../shared/components/callout/callout';
-import { Input } from '../../../../shared/components/input/input';
+import { NbInput, NbLabel } from '@ng-brutalism/ui';
 import { Modal } from '../../../../shared/components/modal/modal';
 import { ModalFooter } from '../../../../shared/components/modal/modal-footer';
 
@@ -50,7 +50,8 @@ describe('AdminPizzaFormDialog', () => {
     ModalFooter,
     Button,
     Callout,
-    Input,
+    NbInput,
+    NbLabel,
     MockImagePicker,
     FormRoot,
     FormField,

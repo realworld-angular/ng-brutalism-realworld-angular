@@ -6,6 +6,7 @@ import {
   signal,
   input,
   effect,
+  ViewChild,
 } from '@angular/core';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { DecimalPipe, NgOptimizedImage } from '@angular/common';
@@ -17,14 +18,12 @@ import { Spinner } from '../../../../shared/components/spinner/spinner';
 import { RoleDirective } from '../../../../shared/directives/role.directive';
 import { EmptyState } from '../../../../shared/components/empty-state/empty-state';
 import { PizzaOrderFormDialog } from '../../../orders/components/pizza-order-form-dialog/pizza-order-form-dialog';
-import { PizzaOrderFormDialogData } from '../../../orders/order.models';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { map, switchMap } from 'rxjs/operators';
 import { merge, of, Subject, timer } from 'rxjs';
 import { form, FormRoot, FormField, debounce } from '@angular/forms/signals';
-import { Dialog } from '@angular/cdk/dialog';
 import { CatalogImageUrlPipe } from '../../../../shared/pipes/catalog-image-url.pipe';
-import { Button } from '../../../../shared/components/button/button';
+import { NbButton, NbInput, NbCard, NbCardHeader, NbCardTitle, NbCardFooter, NbCardActions } from '@ng-brutalism/ui';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 interface FilterFormModel {
@@ -44,15 +43,22 @@ interface FilterFormModel {
     FormRoot,
     FormField,
     CatalogImageUrlPipe,
-    Button,
+    NbButton,
+    NbInput,
+    NbCard,
+    NbCardHeader,
+    NbCardTitle,
+    NbCardFooter,
+    NbCardActions,
+    PizzaOrderFormDialog,
   ],
   templateUrl: './pizzeria-details-page.html',
   styleUrl: './pizzeria-details-page.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PizzeriaDetailsPage {
+  @ViewChild(PizzaOrderFormDialog) private readonly pizzaOrderFormDialog!: PizzaOrderFormDialog;
   private readonly destroyRef = inject(DestroyRef);
-  private readonly dialog = inject(Dialog);
   private readonly title = inject(Title);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
@@ -125,24 +131,15 @@ export class PizzeriaDetailsPage {
     });
   }
 
-  protected openOrderModal(pizza: Pizza): void {
-    const ref = this.dialog.open<string, PizzaOrderFormDialogData, PizzaOrderFormDialog>(
-      PizzaOrderFormDialog,
-      {
-        data: {
-          pizza,
-          pizzeriaId: this.id(),
-          displayPizzeriaName: this.pizzeriaResource.value()?.name ?? '',
-        },
-        hasBackdrop: false,
-      },
-    );
-
-    ref.closed.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((result) => {
-      if (result === 'added') {
-        this.showAddedToCartBanner();
-      }
+  protected async openOrderModal(pizza: Pizza): Promise<void> {
+    const result = await this.pizzaOrderFormDialog.open({
+      pizza,
+      pizzeriaId: this.id(),
+      displayPizzeriaName: this.pizzeriaResource.value()?.name ?? '',
     });
+    if (result === 'added') {
+      this.showAddedToCartBanner();
+    }
   }
 
   protected dismissAddedToCartBanner(): void {

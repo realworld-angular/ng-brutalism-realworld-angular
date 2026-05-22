@@ -1,43 +1,58 @@
-<rw-modal [title]="isEditMode ? 'Edit Pizza' : 'New Pizza'">
-  <form [formRoot]="pizzaForm" class="admin-form">
-    @if (pizzaForm().errors()[0]; as err) {
-      <rw-callout variant="error" [message]="err.message!" />
-    }
-    <rw-input
-      label="Name"
-      type="text"
-      [formField]="pizzaForm.name"
-      [placeholder]="
-        isEditMode
-          ? ''
-          : 'The name is assigned automatically when you save; you cannot set it here.'
-      "
-    />
-
-    <rw-input label="Base price (€)" type="number" [formField]="pizzaForm.basePrice" />
-
-    <rw-image-picker category="pizza" label="Pizza image" [formField]="pizzaForm.image" />
-
-    <fieldset class="admin-form__toppings">
-      <legend>Toppings</legend>
-      @for (topping of pizzaForm.extraToppings; track topping) {
-        <label
-          class="admin-form__topping-option"
-          [class.admin-form__topping-option--selected]="toppingInput.checked"
-        >
-          <input #toppingInput type="checkbox" class="sr-only" [formField]="topping" />
-          <span class="admin-form__topping-label">{{
-            toppingsResource.value()![$index].label
-          }}</span>
-          <span class="admin-form__topping-price" aria-label="Extra price"
-            >+€{{ toppingsResource.value()![$index].price | number: '1.2-2' }}</span
-          >
-        </label>
+<nb-dialog>
+  <nb-dialog-content>
+    <h2>{{ isEditMode() ? 'Edit Pizza' : 'New Pizza' }}</h2>
+    <form [formRoot]="pizzaForm" class="admin-form">
+      @if (pizzaForm().errors()[0]; as err) {
+        <rw-callout variant="error" [message]="err.message!" />
       }
-    </fieldset>
-  </form>
+      <div class="field" [class.field--error]="pizzaForm.name().touched() && pizzaForm.name().errors().length">
+        <label nbLabel for="pizza-name" class="field__label">
+          Name
+          @if (pizzaForm.name().required()) {
+            <span class="field__required" aria-hidden="true">*</span>
+          }
+        </label>
+        <input nbInput id="pizza-name" type="text" [formField]="pizzaForm.name" [placeholder]="isEditMode() ? '' : 'The name is assigned automatically when you save; you cannot set it here.'" />
+        @if (pizzaForm.name().touched() && pizzaForm.name().errors().length) {
+          <span class="field__error" role="alert">{{ pizzaForm.name().errors()[0].message }}</span>
+        }
+      </div>
 
-  <rw-modal-footer class="admin-modal-footer">
+      <div class="field" [class.field--error]="pizzaForm.basePrice().touched() && pizzaForm.basePrice().errors().length">
+        <label nbLabel for="pizza-base-price" class="field__label">
+          Base price (€)
+          @if (pizzaForm.basePrice().required()) {
+            <span class="field__required" aria-hidden="true">*</span>
+          }
+        </label>
+        <input nbInput id="pizza-base-price" type="number" [formField]="pizzaForm.basePrice" />
+        @if (pizzaForm.basePrice().touched() && pizzaForm.basePrice().errors().length) {
+          <span class="field__error" role="alert">{{ pizzaForm.basePrice().errors()[0].message }}</span>
+        }
+      </div>
+
+      <rw-image-picker category="pizza" label="Pizza image" [formField]="pizzaForm.image" />
+
+      <fieldset class="admin-form__toppings">
+        <legend>Toppings</legend>
+        @for (topping of pizzaForm.extraToppings; track topping) {
+          <label
+            class="admin-form__topping-option"
+            [class.admin-form__topping-option--selected]="toppingInput.checked"
+          >
+            <input #toppingInput type="checkbox" class="sr-only" [formField]="topping" />
+            <span class="admin-form__topping-label">{{
+              toppingsResource.value()![$index].label
+            }}</span>
+            <span class="admin-form__topping-price" aria-label="Extra price"
+              >+€{{ toppingsResource.value()![$index].price | number: '1.2-2' }}</span
+            >
+          </label>
+        }
+      </fieldset>
+    </form>
+  </nb-dialog-content>
+  <nb-dialog-actions>
     <div class="admin-modal-footer__pricing">
       <p class="admin-modal-footer__total-line">
         <span class="admin-modal-footer__total-label">Total price</span>
@@ -46,13 +61,18 @@
         </strong>
       </p>
     </div>
-    <div class="admin-modal-footer__actions">
-      <rw-button variant="ghost" palette="secondary" type="button" (click)="dismiss()"
-        >Cancel</rw-button
-      >
-      <rw-button type="submit" [isLoading]="pizzaForm().submitting()" (click)="save()">
-        {{ isEditMode ? 'Save changes' : 'Create pizza' }}
-      </rw-button>
+    <div style="display: flex; gap: 0.5rem;">
+      <button nbButton variant="default" type="button" (click)="dismiss()" style="--nb-button-bg: transparent; --nb-button-border: transparent">
+        Cancel
+      </button>
+      <button nbButton variant="neutral" type="submit" [disabled]="pizzaForm().submitting()" (click)="save()">
+        @if (pizzaForm().submitting()) {
+          <span class="btn-spinner"></span>
+          <span class="sr-only">Saving…</span>
+        } @else {
+          {{ isEditMode() ? 'Save changes' : 'Create pizza' }}
+        }
+      </button>
     </div>
-  </rw-modal-footer>
-</rw-modal>
+  </nb-dialog-actions>
+</nb-dialog>

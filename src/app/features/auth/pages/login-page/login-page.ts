@@ -5,13 +5,12 @@ import { Router } from '@angular/router';
 import { form, FormField, required, email, FormRoot } from '@angular/forms/signals';
 import { Auth } from '../../../../core/services/auth';
 import { Callout } from '../../../../shared/components/callout/callout';
-import { Input } from '../../../../shared/components/input/input';
-import { Button } from '../../../../shared/components/button/button';
+import { NbButton, NbInput, NbLabel, NbInputGroup, NbInputSuffix } from '@ng-brutalism/ui';
 import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'rw-login-page',
-  imports: [RouterLink, FormField, Input, Button, Callout, FormRoot],
+  imports: [RouterLink, FormField, NbButton, NbInput, NbLabel, NbInputGroup, NbInputSuffix, Callout, FormRoot],
   templateUrl: './login-page.html',
   styleUrl: './login-page.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

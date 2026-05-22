@@ -5,32 +5,31 @@ import {
   signal,
   effect,
   DestroyRef,
+  ViewChild,
   untracked,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormField, form, required, FormRoot } from '@angular/forms/signals';
 import { httpResource } from '@angular/common/http';
 import { Title } from '@angular/platform-browser';
-import { filter, firstValueFrom, switchMap, finalize } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 import { Router } from '@angular/router';
 import { PizzeriaApi } from '../../services/pizzeria-api';
 import { Callout } from '../../../../shared/components/callout/callout';
 import { PizzeriaDetail } from '../../models/pizzeria.models';
-import { Button } from '../../../../shared/components/button/button';
+import { NbButton } from '@ng-brutalism/ui';
 import { ImagePicker } from '../../../../shared/components/image-picker/image-picker';
 import { PhotonLocationField } from '../../../../shared/components/photon-location-field/photon-location-field';
 import type { LocationValue } from '../../../../shared/components/photon-location-field/photon-location-field';
 import { Spinner } from '../../../../shared/components/spinner/spinner';
-import { Dialog } from '@angular/cdk/dialog';
 import {
   ConfirmDialog,
   ConfirmDialogData,
-  ConfirmDialogResult,
 } from '../../../../shared/components/confirm-dialog/confirm-dialog';
 
 @Component({
   selector: 'rw-admin-pizzeria-configuration-page',
-  imports: [Button, FormField, FormRoot, ImagePicker, Callout, PhotonLocationField, Spinner],
+  imports: [NbButton, FormField, FormRoot, ImagePicker, Callout, PhotonLocationField, Spinner, ConfirmDialog],
   templateUrl: './admin-pizzeria-configuration-page.html',
   styleUrl: './admin-pizzeria-configuration-page.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -39,7 +38,7 @@ export class AdminPizzeriaConfigurationPage {
   private readonly pizzeriaApi = inject(PizzeriaApi);
   private readonly destroyRef = inject(DestroyRef);
   private readonly router = inject(Router);
-  private readonly dialog = inject(Dialog);
+  @ViewChild(ConfirmDialog) private readonly confirmDlg!: ConfirmDialog;
   private readonly title = inject(Title);
 
   protected readonly pizzeriaResource = httpResource<PizzeriaDetail>(
@@ -109,33 +108,25 @@ export class AdminPizzeriaConfigurationPage {
     });
   }
 
-  protected deletePizzeria(): void {
+  protected async deletePizzeria(): Promise<void> {
     const pizzeria = this.pizzeriaResource.value()!;
-
     const message = `Are you sure you want to delete "${pizzeria.name}"? This action cannot be undone.`;
-    const ref = this.dialog.open<ConfirmDialogResult, ConfirmDialogData>(ConfirmDialog, {
-      data: {
-        title: 'Delete pizzeria',
-        message,
-        cancelLabel: 'Cancel',
-        confirmLabel: 'Delete pizzeria',
-      },
+
+    const result = await this.confirmDlg.open({
+      title: 'Delete pizzeria',
+      message,
+      cancelLabel: 'Cancel',
+      confirmLabel: 'Delete pizzeria' as const,
     });
 
-    ref.closed
-      .pipe(
-        filter((result) => result === 'confirmed'),
-        switchMap(() => {
-          this.isDeleting.set(true);
-          return this.pizzeriaApi.deleteMyPizzeria();
-        }),
-        finalize(() => this.isDeleting.set(false)),
-        takeUntilDestroyed(this.destroyRef),
-      )
-      .subscribe({
-        next: () => {
-          void this.router.navigateByUrl('/pizzerias/admin/new');
-        },
-      });
+    if (result === 'confirmed') {
+      this.isDeleting.set(true);
+      try {
+        await firstValueFrom(this.pizzeriaApi.deleteMyPizzeria().pipe(takeUntilDestroyed(this.destroyRef)));
+        void this.router.navigateByUrl('/pizzerias/admin/new');
+      } finally {
+        this.isDeleting.set(false);
+      }
+    }
   }
 }

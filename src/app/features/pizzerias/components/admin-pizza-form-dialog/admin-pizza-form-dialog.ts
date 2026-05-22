@@ -5,20 +5,22 @@ import {
   effect,
   inject,
   signal,
+  ViewChild,
 } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 import { httpResource } from '@angular/common/http';
 import { form, FormField, required, disabled, FormRoot, submit, min } from '@angular/forms/signals';
-import { DialogRef, DIALOG_DATA } from '@angular/cdk/dialog';
+import { NbDialog, NbDialogContent, NbDialogActions, NbButton, NbInput, NbLabel } from '@ng-brutalism/ui';
 import { PizzaApi } from '../../services/pizza-api';
 import { Callout } from '../../../../shared/components/callout/callout';
 import { Pizza, PizzaOption } from '../../models/pizza.models';
-import { Input } from '../../../../shared/components/input/input';
-import { Button } from '../../../../shared/components/button/button';
 import { ImagePicker } from '../../../../shared/components/image-picker/image-picker';
-import { Modal } from '../../../../shared/components/modal/modal';
-import { ModalFooter } from '../../../../shared/components/modal/modal-footer';
 import { firstValueFrom } from 'rxjs';
+
+export interface AdminPizzaFormResult {
+  pizza: Pizza;
+  mode: 'create' | 'edit';
+}
 
 interface AdminPizzaFormModel {
   basePrice: number;
@@ -30,15 +32,8 @@ interface AdminPizzaFormModel {
 @Component({
   selector: 'rw-admin-pizza-form-dialog',
   imports: [
-    DecimalPipe,
-    FormField,
-    FormRoot,
-    Input,
-    Button,
-    ImagePicker,
-    Modal,
-    ModalFooter,
-    Callout,
+    NbDialog, NbDialogContent, NbDialogActions, NbButton, NbInput, NbLabel,
+    DecimalPipe, FormField, FormRoot, ImagePicker, Callout,
   ],
   templateUrl: './admin-pizza-form-dialog.html',
   styleUrl: './admin-pizza-form-dialog.css',
@@ -46,19 +41,21 @@ interface AdminPizzaFormModel {
 })
 export class AdminPizzaFormDialog {
   private readonly api = inject(PizzaApi);
-  private readonly dialogRef = inject(DialogRef);
-  public readonly data = inject<Pizza | null>(DIALOG_DATA, { optional: true });
+  @ViewChild(NbDialog) private readonly dialog!: NbDialog;
 
-  protected readonly isEditMode = this.data !== null;
+  protected readonly data = signal<Pizza | null>(null);
+  private resolve: ((result: AdminPizzaFormResult | undefined) => void) | null = null;
+
+  protected readonly isEditMode = computed(() => this.data() !== null);
 
   protected readonly toppingsResource = httpResource<PizzaOption[]>(() => '/api/options/toppings', {
     defaultValue: [],
   });
 
   protected readonly model = signal<AdminPizzaFormModel>({
-    basePrice: this.data?.basePrice ?? 10,
-    name: this.data?.name ?? '',
-    image: this.data?.image ?? null,
+    basePrice: 10,
+    name: '',
+    image: null,
     extraToppings: [],
   });
 
@@ -82,13 +79,14 @@ export class AdminPizzaFormDialog {
             imageFilename: image!,
             toppingIds,
           };
-          const req = this.isEditMode
-            ? this.api.updatePizza(this.data!.id, payload)
+          const req = this.isEditMode()
+            ? this.api.updatePizza(this.data()!.id, payload)
             : this.api.createPizza(payload);
 
           try {
             const pizza = await firstValueFrom(req);
-            this.dialogRef.close({ pizza, mode: this.isEditMode ? 'edit' : 'create' });
+            this.resolve?.({ pizza, mode: this.isEditMode() ? 'edit' : 'create' });
+            this.dialog.close();
           } catch {
             return { kind: 'serverError', message: 'Save failed' };
           }
@@ -111,14 +109,28 @@ export class AdminPizzaFormDialog {
   public constructor() {
     effect(() => {
       const toppings = this.toppingsResource.value();
-      if (toppings) {
+      if (toppings && this.data()) {
         this.model.update((m) => ({
           ...m,
           extraToppings: toppings.map(
-            (t) => this.data?.toppings?.some((pt) => pt.id === t.id) ?? false,
+            (t) => this.data()?.toppings?.some((pt) => pt.id === t.id) ?? false,
           ),
         }));
       }
+    });
+  }
+
+  open(pizza: Pizza | null): Promise<AdminPizzaFormResult | undefined> {
+    this.data.set(pizza);
+    this.model.set({
+      basePrice: pizza?.basePrice ?? 10,
+      name: pizza?.name ?? '',
+      image: pizza?.image ?? null,
+      extraToppings: [],
+    });
+    this.dialog.open();
+    return new Promise((resolve) => {
+      this.resolve = resolve;
     });
   }
 
@@ -127,6 +139,7 @@ export class AdminPizzaFormDialog {
   }
 
   protected dismiss(): void {
-    this.dialogRef.close();
+    this.resolve?.(undefined);
+    this.dialog.close();
   }
 }

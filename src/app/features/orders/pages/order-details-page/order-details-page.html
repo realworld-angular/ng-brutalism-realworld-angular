@@ -19,9 +19,14 @@
         <div class="detail-header__right">
           <rw-status-badge [status]="order.status" />
           @if (order.status === 'PENDING') {
-            <rw-button palette="danger" size="sm" [isLoading]="isCancelling()" (click)="cancel()">
-              Cancel order
-            </rw-button>
+            <button nbButton variant="danger" size="sm" [disabled]="isCancelling()" (click)="cancel()">
+              @if (isCancelling()) {
+                <span class="btn-spinner"></span>
+                <span class="sr-only">Cancelling…</span>
+              } @else {
+                Cancel order
+              }
+            </button>
           }
         </div>
       </div>

@@ -13,6 +13,8 @@ import { HeroBanner } from '../../../../shared/components/hero-banner/hero-banne
 import { CatalogImageUrlPipe } from '../../../../shared/pipes/catalog-image-url.pipe';
 import { FormsModule } from '@angular/forms';
 import { Callout } from '../../../../shared/components/callout/callout';
+import { NbCard, NbCardHeader, NbCardTitle, NbCardDescription, NbCardFooter } from '@ng-brutalism/ui';
+import { NbInput } from '@ng-brutalism/ui';
 
 @Component({
   selector: 'rw-pizzeria-list-page',
@@ -26,6 +28,12 @@ import { Callout } from '../../../../shared/components/callout/callout';
     CatalogImageUrlPipe,
     FormsModule,
     Callout,
+    NbCard,
+    NbCardHeader,
+    NbCardTitle,
+    NbCardDescription,
+    NbCardFooter,
+    NbInput,
   ],
   templateUrl: './pizzeria-list-page.html',
   styleUrl: './pizzeria-list-page.css',

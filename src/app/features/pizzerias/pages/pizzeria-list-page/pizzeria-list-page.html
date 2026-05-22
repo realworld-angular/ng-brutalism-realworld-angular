@@ -5,6 +5,7 @@
     <div class="pizzerias-toolbar">
       <label for="pizzeria-search" class="sr-only">Search pizzerias</label>
       <input
+        nbInput
         id="pizzeria-search"
         type="search"
         class="pizzeria-search__input"
@@ -33,26 +34,28 @@
           <li>
             <a
               [routerLink]="['/pizzerias', pizzeria.id]"
-              class="pizzeria-card"
+              class="pizzeria-card-link"
               aria-label="View {{ pizzeria.name }} pizzeria"
             >
-              <div class="pizzeria-card__image-wrap">
-                <img
-                  [ngSrc]="pizzeria.image | catalogImageUrl: 'pizzeria'"
-                  alt=""
-                  class="pizzeria-card__image"
-                  width="600"
-                  height="400"
-                  disableOptimizedSrcset
-                />
-              </div>
-              <div class="pizzeria-card__body">
-                <h3 class="pizzeria-card__name">{{ pizzeria.name }}</h3>
-                <p class="pizzeria-card__location">{{ pizzeria.city }}, {{ pizzeria.country }}</p>
-                <p class="pizzeria-card__meta">
-                  <span>{{ pizzeria._count.pizzas }} pizzas</span>
-                </p>
-              </div>
+              <nb-card>
+                <div class="pizzeria-card__image-wrap">
+                  <img
+                    [ngSrc]="pizzeria.image | catalogImageUrl: 'pizzeria'"
+                    alt=""
+                    class="pizzeria-card__image"
+                    width="600"
+                    height="400"
+                    disableOptimizedSrcset
+                  />
+                </div>
+                <nb-card-header>
+                  <nb-card-title>{{ pizzeria.name }}</nb-card-title>
+                  <nb-card-description>{{ pizzeria.city }}, {{ pizzeria.country }}</nb-card-description>
+                </nb-card-header>
+                <nb-card-footer>
+                  <span class="pizzeria-card__meta">{{ pizzeria._count.pizzas }} pizzas</span>
+                </nb-card-footer>
+              </nb-card>
             </a>
           </li>
         }

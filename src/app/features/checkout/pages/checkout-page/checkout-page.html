@@ -8,7 +8,7 @@
         title="Your cart is empty"
         text="Add pizza from a pizzeria menu before you can check out."
       >
-        <a routerLink="/">Browse pizzerias</a>
+        <a nbButton variant="neutral" routerLink="/">Browse pizzerias</a>
       </rw-empty-state>
     } @else {
       @let data = cartStore.cart()!;
@@ -27,11 +27,18 @@
                 label="City and country"
                 [formField]="checkoutForm.delivery.location"
               />
-              <rw-input
-                label="Street address"
-                [formField]="checkoutForm.delivery.street"
-                placeholder="Street, number, building, floor…"
-              />
+              <div class="field" [class.field--error]="checkoutForm.delivery.street().touched() && checkoutForm.delivery.street().errors().length">
+                <label nbLabel for="checkout-delivery-street" class="field__label">
+                  Street address
+                  @if (checkoutForm.delivery.street().required()) {
+                    <span class="field__required" aria-hidden="true">*</span>
+                  }
+                </label>
+                <input nbInput id="checkout-delivery-street" [formField]="checkoutForm.delivery.street" placeholder="Street, number, building, floor…" />
+                @if (checkoutForm.delivery.street().touched() && checkoutForm.delivery.street().errors().length) {
+                  <span class="field__error" role="alert">{{ checkoutForm.delivery.street().errors()[0].message }}</span>
+                }
+              </div>
             </fieldset>
 
             <fieldset class="address-fieldset">
@@ -56,29 +63,41 @@
                     label="City and country"
                     [formField]="checkoutForm.billing.location"
                   />
-                  <rw-input
-                    label="Street address"
-                    [formField]="checkoutForm.billing.street"
-                    placeholder="Street, number, building, floor…"
-                  />
+                  <div class="field" [class.field--error]="checkoutForm.billing.street().touched() && checkoutForm.billing.street().errors().length">
+                    <label nbLabel for="checkout-billing-street" class="field__label">
+                      Street address
+                      @if (checkoutForm.billing.street().required()) {
+                        <span class="field__required" aria-hidden="true">*</span>
+                      }
+                    </label>
+                    <input nbInput id="checkout-billing-street" [formField]="checkoutForm.billing.street" placeholder="Street, number, building, floor…" />
+                    @if (checkoutForm.billing.street().touched() && checkoutForm.billing.street().errors().length) {
+                      <span class="field__error" role="alert">{{ checkoutForm.billing.street().errors()[0].message }}</span>
+                    }
+                  </div>
                 </div>
               }
             </fieldset>
 
-            <rw-textarea
-              label="Order notes"
-              [formField]="checkoutForm.notes"
-              placeholder="Any special instructions?"
-              [maxLength]="300"
-            />
+            <div class="field" [class.field--error]="checkoutForm.notes().touched() && checkoutForm.notes().errors().length">
+              <label nbLabel for="checkout-notes" class="field__label">Order notes</label>
+              <textarea nbTextarea id="checkout-notes" [formField]="checkoutForm.notes" placeholder="Any special instructions?" rows="4"></textarea>
+              @if (!(checkoutForm.notes().touched() && checkoutForm.notes().errors().length)) {
+                <span class="field__hint">{{ notesCharCount() }} / 300</span>
+              }
+              @if (checkoutForm.notes().touched() && checkoutForm.notes().errors().length) {
+                <span class="field__error" role="alert">{{ checkoutForm.notes().errors()[0].message }}</span>
+              }
+            </div>
 
-            <rw-button
-              class="submit-button"
-              type="submit"
-              [isLoading]="checkoutForm().submitting()"
-            >
-              Place order
-            </rw-button>
+            <button nbButton variant="neutral" type="submit" [disabled]="checkoutForm().submitting()" [fullWidth]="true">
+              @if (checkoutForm().submitting()) {
+                <span class="btn-spinner"></span>
+                <span class="sr-only">Placing order…</span>
+              } @else {
+                Place order
+              }
+            </button>
           </form>
         </section>
 
@@ -102,3 +121,5 @@
     }
   </div>
 </div>
+
+<rw-confirm-dialog />

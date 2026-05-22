@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { FormField, form, required, FormRoot } from '@angular/forms/signals';
 import { PizzeriaApi } from '../../services/pizzeria-api';
 import { Callout } from '../../../../shared/components/callout/callout';
-import { Button } from '../../../../shared/components/button/button';
+import { NbButton } from '@ng-brutalism/ui';
 import { ImagePicker } from '../../../../shared/components/image-picker/image-picker';
 import { PhotonLocationField } from '../../../../shared/components/photon-location-field/photon-location-field';
 import type { LocationValue } from '../../../../shared/components/photon-location-field/photon-location-field';
@@ -16,7 +16,7 @@ interface PizzeriaForm {
 
 @Component({
   selector: 'rw-admin-pizzeria-form-page',
-  imports: [Button, FormField, ImagePicker, Callout, PhotonLocationField, FormRoot],
+  imports: [NbButton, FormField, ImagePicker, Callout, PhotonLocationField, FormRoot],
   templateUrl: './admin-pizzeria-form-page.html',
   styleUrl: './admin-pizzeria-form-page.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

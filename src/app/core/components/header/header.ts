@@ -9,14 +9,14 @@ import {
 } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { Auth } from '../../services/auth';
-import { Avatar } from '../../../shared/components/avatar/avatar';
+import { NbButton, NbAvatar } from '@ng-brutalism/ui';
 import { PizzaLogo } from '../../../shared/components/pizza-logo/pizza-logo';
 import { CartStore } from '../../../features/cart/cart.store';
 import { RoleDirective } from '../../../shared/directives/role.directive';
 
 @Component({
   selector: 'rw-header',
-  imports: [RouterLink, RouterLinkActive, NgOptimizedImage, Avatar, PizzaLogo, RoleDirective],
+  imports: [RouterLink, RouterLinkActive, NgOptimizedImage, NbButton, NbAvatar, PizzaLogo, RoleDirective],
   templateUrl: './header.html',
   styleUrl: './header.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -48,5 +48,13 @@ export class Header {
 
   protected closeMobileMenu(): void {
     this.isMobileMenuOpen.set(false);
+  }
+
+  protected getInitials(name: string): string {
+    const parts = name.split(/(?=[A-Z])/);
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+    return name.slice(0, 2).toUpperCase();
   }
 }

@@ -15,7 +15,7 @@ import { OrderApi } from '../../order-api';
 import { Callout } from '../../../../shared/components/callout/callout';
 import { Order } from '../../order.models';
 import { Spinner } from '../../../../shared/components/spinner/spinner';
-import { Button } from '../../../../shared/components/button/button';
+import { NbButton } from '@ng-brutalism/ui';
 import { EmptyState } from '../../../../shared/components/empty-state/empty-state';
 import { Observable } from 'rxjs';
 import { Title } from '@angular/platform-browser';
@@ -29,7 +29,7 @@ import { StatusBadge } from '../../../../shared/components/status-badge/status-b
     DatePipe,
     TitleCasePipe,
     Spinner,
-    Button,
+    NbButton,
     Callout,
     EmptyState,
     StatusBadge,

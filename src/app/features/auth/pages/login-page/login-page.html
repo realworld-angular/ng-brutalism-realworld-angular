@@ -7,36 +7,46 @@
       @if (loginForm().errors()[0]; as err) {
         <rw-callout variant="error" [message]="err.message!" />
       }
-      <rw-input label="Email" type="email" autocomplete="email" [formField]="loginForm.email" />
-      <rw-input
-        label="Password"
-        [type]="showPassword.checked ? 'text' : 'password'"
-        autocomplete="current-password"
-        [formField]="loginForm.password"
-      >
-        <label
-          rwInputSuffix
-          class="password-toggle"
-          [attr.aria-label]="showPassword.checked ? 'Hide password' : 'Show password'"
-        >
-          <input
-            #showPassword
-            type="checkbox"
-            class="password-toggle__checkbox"
-            (change)="(void 0)"
-          />
-          <img
-            [src]="showPassword.checked ? '/icons/visibility-off.svg' : '/icons/visibility.svg'"
-            width="24"
-            height="24"
-            alt=""
-            aria-hidden="true"
-          />
+      <div class="field" [class.field--error]="loginForm.email().touched() && loginForm.email().errors().length">
+        <label nbLabel for="login-email" class="field__label">
+          Email
+          @if (loginForm.email().required()) {
+            <span class="field__required" aria-hidden="true">*</span>
+          }
         </label>
-      </rw-input>
-      <rw-button type="submit" [isLoading]="loginForm().submitting()" class="btn--full">
-        Log in
-      </rw-button>
+        <input nbInput id="login-email" type="email" autocomplete="email" [formField]="loginForm.email" />
+        @if (loginForm.email().touched() && loginForm.email().errors().length) {
+          <span class="field__error" role="alert">{{ loginForm.email().errors()[0].message }}</span>
+        }
+      </div>
+      <div class="field" [class.field--error]="loginForm.password().touched() && loginForm.password().errors().length">
+        <label nbLabel for="login-password" class="field__label">
+          Password
+          @if (loginForm.password().required()) {
+            <span class="field__required" aria-hidden="true">*</span>
+          }
+        </label>
+        <nb-input-group>
+          <input nbInput id="login-password" [type]="showPassword.checked ? 'text' : 'password'" autocomplete="current-password" [formField]="loginForm.password" />
+          <span nbInputSuffix>
+            <label class="password-toggle" [attr.aria-label]="showPassword.checked ? 'Hide password' : 'Show password'">
+              <input #showPassword type="checkbox" class="password-toggle__checkbox" (change)="(void 0)" />
+              <img [src]="showPassword.checked ? '/icons/visibility-off.svg' : '/icons/visibility.svg'" width="24" height="24" alt="" aria-hidden="true" />
+            </label>
+          </span>
+        </nb-input-group>
+        @if (loginForm.password().touched() && loginForm.password().errors().length) {
+          <span class="field__error" role="alert">{{ loginForm.password().errors()[0].message }}</span>
+        }
+      </div>
+      <button nbButton type="submit" [disabled]="loginForm().submitting()" [fullWidth]="true">
+        @if (loginForm().submitting()) {
+          <span class="btn-spinner"></span>
+          <span class="sr-only">Logging in…</span>
+        } @else {
+          Log in
+        }
+      </button>
     </form>
 
     <p class="auth-card__footer">

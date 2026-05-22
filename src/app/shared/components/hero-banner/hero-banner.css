@@ -29,6 +29,7 @@
   letter-spacing: -0.02em;
   color: var(--color-accent);
   text-transform: uppercase;
+  text-decoration: underline;
 }
 
 .hero__edition-suffix {

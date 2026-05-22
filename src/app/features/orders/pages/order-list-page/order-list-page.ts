@@ -7,6 +7,7 @@ import {
   effect,
 } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { NbButton } from '@ng-brutalism/ui';
 import { DecimalPipe, DatePipe } from '@angular/common';
 import { httpResource } from '@angular/common/http';
 import { Auth } from '../../../../core/services/auth';
@@ -23,6 +24,7 @@ import { StatusBadge } from '../../../../shared/components/status-badge/status-b
   selector: 'rw-orders-list-page',
   imports: [
     RouterLink,
+    NbButton,
     DecimalPipe,
     DatePipe,
     Spinner,

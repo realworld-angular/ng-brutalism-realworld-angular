@@ -33,9 +33,14 @@
       />
 
       <div class="form-actions">
-        <rw-button type="submit" [isLoading]="pizzeriaForm().submitting()">
-          Save changes
-        </rw-button>
+        <button nbButton variant="neutral" type="submit" [disabled]="pizzeriaForm().submitting()">
+          @if (pizzeriaForm().submitting()) {
+            <span class="btn-spinner"></span>
+            <span class="sr-only">Saving…</span>
+          } @else {
+            Save changes
+          }
+        </button>
       </div>
 
       <div class="danger-zone" aria-label="Danger zone">
@@ -43,16 +48,17 @@
           variant="error"
           message="Danger zone: deleting this pizzeria permanently removes it and cannot be undone."
         >
-          <rw-button
-            type="button"
-            palette="danger"
-            [isLoading]="isDeleting()"
-            (click)="deletePizzeria()"
-          >
-            Delete pizzeria
-          </rw-button>
+          <button nbButton variant="danger" type="button" [disabled]="isDeleting()" (click)="deletePizzeria()">
+            @if (isDeleting()) {
+              <span class="btn-spinner"></span>
+              <span class="sr-only">Deleting…</span>
+            } @else {
+              Delete pizzeria
+            }
+          </button>
         </rw-callout>
       </div>
     </form>
   </div>
+  <rw-confirm-dialog />
 }

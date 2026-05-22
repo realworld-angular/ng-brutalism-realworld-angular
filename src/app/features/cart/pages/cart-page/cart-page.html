@@ -21,9 +21,9 @@
                 </a>
               </strong>
             </p>
-            <rw-button variant="outlined" size="sm" type="button" (click)="cartStore.clear()">
+            <button nbButton variant="default" size="sm" type="button" (click)="cartStore.clear()" style="--nb-button-bg: transparent">
               Clear cart
-            </rw-button>
+            </button>
           </div>
 
           <ul class="pizza-list" role="list">
@@ -112,8 +112,8 @@
           @if (!auth.isAuthenticated()) {
             <div class="guest-checkout-notice">
               <p class="guest-checkout-notice__text">Please log in to place your order.</p>
-              <rw-button class="btn--full" routerLink="/auth/login"> Log in to checkout </rw-button>
-              <a routerLink="/auth/register" class="guest-checkout-notice__register">
+              <button nbButton [fullWidth]="true" routerLink="/auth/login"> Log in to checkout </button>
+              <a nbButton variant="neutral" routerLink="/auth/register">
                 No account? Join for free
               </a>
             </div>
@@ -136,7 +136,7 @@
             <strong>€{{ data.total | number: '1.2-2' }}</strong>
           </div>
           @if (auth.isAuthenticated()) {
-            <rw-button class="btn--full" routerLink="/checkout"> Proceed to checkout </rw-button>
+            <button nbButton [fullWidth]="true" routerLink="/checkout"> Proceed to checkout </button>
           }
         </aside>
       </div>

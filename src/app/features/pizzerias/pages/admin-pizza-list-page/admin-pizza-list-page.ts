@@ -1,25 +1,24 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal, ViewChild } from '@angular/core';
 import { httpResource } from '@angular/common/http';
 import { PizzaApi } from '../../services/pizza-api';
 import { Callout } from '../../../../shared/components/callout/callout';
 import { Pizza } from '../../models/pizza.models';
-import { Button } from '../../../../shared/components/button/button';
+import { NbButton } from '@ng-brutalism/ui';
 import { Spinner } from '../../../../shared/components/spinner/spinner';
 import { EmptyState } from '../../../../shared/components/empty-state/empty-state';
-import { Dialog } from '@angular/cdk/dialog';
 import { AdminPizzaFormDialog } from '../../components/admin-pizza-form-dialog/admin-pizza-form-dialog';
 import { AdminPizzaRow } from '../../components/admin-pizza-row/admin-pizza-row';
 
 @Component({
   selector: 'rw-admin-pizzas-page',
-  imports: [Button, Spinner, Callout, EmptyState, AdminPizzaRow],
+  imports: [NbButton, Spinner, Callout, EmptyState, AdminPizzaRow, AdminPizzaFormDialog],
   templateUrl: './admin-pizza-list-page.html',
   styleUrl: './admin-pizza-list-page.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AdminPizzaListPage {
   private readonly api = inject(PizzaApi);
-  private readonly dialog = inject(Dialog);
+  @ViewChild(AdminPizzaFormDialog) private readonly pizzaFormDialog!: AdminPizzaFormDialog;
 
   protected readonly pizzasResource = httpResource<Pizza[]>(() => '/api/admin/pizzeria/pizzas');
 
@@ -33,28 +32,19 @@ export class AdminPizzaListPage {
     this.openPizzaFormDialog(pizza);
   }
 
-  private openPizzaFormDialog(pizza: Pizza | null): void {
-    const ref = this.dialog.open<
-      { pizza: Pizza; mode: 'create' | 'edit' },
-      Pizza | null,
-      AdminPizzaFormDialog
-    >(AdminPizzaFormDialog, {
-      data: pizza,
-    });
-
-    ref.closed.subscribe((event) => {
-      if (!event) return;
-      const { pizza, mode } = event;
-      if (mode === 'edit') {
-        this.pizzasResource.set(
-          (this.pizzasResource.value() ?? []).map((existingPizza) =>
-            existingPizza.id === pizza.id ? pizza : existingPizza,
-          ),
-        );
-      } else {
-        this.pizzasResource.set([...(this.pizzasResource.value() ?? []), pizza]);
-      }
-    });
+  private async openPizzaFormDialog(pizza: Pizza | null): Promise<void> {
+    const result = await this.pizzaFormDialog.open(pizza);
+    if (!result) return;
+    const { pizza: updatedPizza, mode } = result;
+    if (mode === 'edit') {
+      this.pizzasResource.set(
+        (this.pizzasResource.value() ?? []).map((existingPizza) =>
+          existingPizza.id === updatedPizza.id ? updatedPizza : existingPizza,
+        ),
+      );
+    } else {
+      this.pizzasResource.set([...(this.pizzasResource.value() ?? []), updatedPizza]);
+    }
   }
 
   protected onPizzaDeleted(pizza: Pizza): void {

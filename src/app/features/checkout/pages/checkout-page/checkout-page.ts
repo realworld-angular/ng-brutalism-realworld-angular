@@ -1,24 +1,18 @@
-import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, ViewChild } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
-import { map, Observable } from 'rxjs';
 import { DecimalPipe } from '@angular/common';
 import { Title } from '@angular/platform-browser';
 import { form, FormField, required, maxLength, FormRoot } from '@angular/forms/signals';
 import { CartStore } from '../../../cart/cart.store';
 import { OrderApi } from '../../../orders/order-api';
 import { Callout } from '../../../../shared/components/callout/callout';
-import { Input } from '../../../../shared/components/input/input';
-import { Textarea } from '../../../../shared/components/textarea/textarea';
-import { Button } from '../../../../shared/components/button/button';
+import { NbButton, NbInput, NbTextarea, NbLabel } from '@ng-brutalism/ui';
 import { PhotonLocationField } from '../../../../shared/components/photon-location-field/photon-location-field';
 import type { LocationValue } from '../../../../shared/components/photon-location-field/photon-location-field';
 import { EmptyState } from '../../../../shared/components/empty-state/empty-state';
-import { Dialog } from '@angular/cdk/dialog';
 import {
   ConfirmDialog,
-  ConfirmDialogData,
-  ConfirmDialogResult,
 } from '../../../../shared/components/confirm-dialog/confirm-dialog';
 import type { Address } from '../../../../shared/models/address.model';
 
@@ -42,12 +36,14 @@ interface CheckoutForm {
     DecimalPipe,
     FormField,
     FormRoot,
-    Input,
-    Textarea,
-    Button,
+    NbButton,
+    NbInput,
+    NbTextarea,
+    NbLabel,
     Callout,
     PhotonLocationField,
     EmptyState,
+    ConfirmDialog,
   ],
   templateUrl: './checkout-page.html',
   styleUrl: './checkout-page.css',
@@ -57,8 +53,8 @@ export class CheckoutPage {
   private readonly title = inject(Title);
   protected readonly cartStore = inject(CartStore);
   private readonly api = inject(OrderApi);
+  @ViewChild(ConfirmDialog) private readonly confirmDlg!: ConfirmDialog;
   private readonly router = inject(Router);
-  private readonly dialog = inject(Dialog);
 
   /** Set before navigating away after a successful order so {@link canDeactivate} does not prompt. */
   private submitted = signal(false);
@@ -68,6 +64,11 @@ export class CheckoutPage {
     billing: { location: null, street: '' },
     useSameAsBilling: true,
     notes: '',
+  });
+
+  protected readonly notesCharCount = computed(() => {
+    const v = this.checkoutForm.notes()?.value?.();
+    return typeof v === 'string' ? v.length : 0;
   });
 
   protected readonly checkoutForm = form(
@@ -151,19 +152,16 @@ export class CheckoutPage {
     });
   }
 
-  public canDeactivate(): boolean | Observable<boolean> {
+  public canDeactivate(): boolean | Promise<boolean> {
     if (this.submitted() || !this.checkoutForm().dirty()) {
       return true;
     }
-    const ref = this.dialog.open<ConfirmDialogResult, ConfirmDialogData>(ConfirmDialog, {
-      data: {
-        title: 'Leave checkout?',
-        message:
-          'You have entered checkout details. Leave this page? Your draft will not be saved.',
-        cancelLabel: 'Stay',
-        confirmLabel: 'Leave',
-      },
-    });
-    return ref.closed.pipe(map((result) => result === 'confirmed'));
+    return this.confirmDlg.open({
+      title: 'Leave checkout?',
+      message:
+        'You have entered checkout details. Leave this page? Your draft will not be saved.',
+      cancelLabel: 'Stay',
+      confirmLabel: 'Leave',
+    }).then((result) => result === 'confirmed');
   }
 }

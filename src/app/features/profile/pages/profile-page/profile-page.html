@@ -3,7 +3,9 @@
     <div class="profile-page__inner">
       <div class="profile-top">
         <header class="profile-identity">
-          <rw-avatar [name]="user()!.name" />
+          <nb-avatar class="size-20" aria-label="Avatar for {{ user()!.name }}">
+            <span class="text-xl font-bold">{{ getInitials(user()!.name) }}</span>
+          </nb-avatar>
           <div class="profile-identity__text">
             <h1 class="profile-identity__name">{{ user()!.name }}</h1>
             <p class="profile-identity__email">{{ user()!.email }}</p>
@@ -11,14 +13,14 @@
         </header>
 
         <div class="profile-actions">
-          <rw-button
-            variant="outlined"
-            palette="danger"
-            [isLoading]="isLoggingOut()"
-            (click)="logout()"
-          >
-            Log out
-          </rw-button>
+          <button nbButton variant="danger" type="button" [disabled]="isLoggingOut()" (click)="logout()">
+            @if (isLoggingOut()) {
+              <span class="btn-spinner"></span>
+              <span class="sr-only">Logging out…</span>
+            } @else {
+              Log out
+            }
+          </button>
         </div>
       </div>
     </div>

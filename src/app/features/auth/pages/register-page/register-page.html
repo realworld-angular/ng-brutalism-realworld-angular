@@ -12,67 +12,69 @@
       @if (registerForm().errors()[0]; as err) {
         <rw-callout variant="error" [message]="err.message!" />
       }
-      <rw-input label="Email" type="email" autocomplete="email" [formField]="registerForm.email" />
-      <rw-input
-        label="Password"
-        [type]="showPassword.checked ? 'text' : 'password'"
-        autocomplete="new-password"
-        [formField]="registerForm.password"
-        hint="At least 8 characters"
-      >
-        <label
-          rwInputSuffix
-          class="password-toggle"
-          [attr.aria-label]="showPassword.checked ? 'Hide password' : 'Show password'"
-        >
-          <input
-            #showPassword
-            type="checkbox"
-            class="password-toggle__checkbox"
-            (change)="(void 0)"
-          />
-          <img
-            [src]="showPassword.checked ? '/icons/visibility-off.svg' : '/icons/visibility.svg'"
-            width="24"
-            height="24"
-            alt=""
-            aria-hidden="true"
-          />
+      <div class="field" [class.field--error]="registerForm.email().touched() && registerForm.email().errors().length">
+        <label nbLabel for="register-email" class="field__label">
+          Email
+          @if (registerForm.email().required()) {
+            <span class="field__required" aria-hidden="true">*</span>
+          }
         </label>
-      </rw-input>
-      <rw-input
-        label="Confirm Password"
-        [type]="showConfirmPassword.checked ? 'text' : 'password'"
-        autocomplete="new-password"
-        [formField]="registerForm.confirmPassword"
-      >
-        <label
-          rwInputSuffix
-          class="password-toggle"
-          [attr.aria-label]="
-            showConfirmPassword.checked ? 'Hide confirm password' : 'Show confirm password'
-          "
-        >
-          <input
-            #showConfirmPassword
-            type="checkbox"
-            class="password-toggle__checkbox"
-            (change)="(void 0)"
-          />
-          <img
-            [src]="
-              showConfirmPassword.checked ? '/icons/visibility-off.svg' : '/icons/visibility.svg'
-            "
-            width="24"
-            height="24"
-            alt=""
-            aria-hidden="true"
-          />
+        <input nbInput id="register-email" type="email" autocomplete="email" [formField]="registerForm.email" />
+        @if (registerForm.email().touched() && registerForm.email().errors().length) {
+          <span class="field__error" role="alert">{{ registerForm.email().errors()[0].message }}</span>
+        }
+      </div>
+      <div class="field" [class.field--error]="registerForm.password().touched() && registerForm.password().errors().length">
+        <label nbLabel for="register-password" class="field__label">
+          Password
+          @if (registerForm.password().required()) {
+            <span class="field__required" aria-hidden="true">*</span>
+          }
         </label>
-      </rw-input>
-      <rw-button type="submit" [isLoading]="registerForm().submitting()" class="btn--full">
-        {{ registerAsPizzeriaOwner() ? 'Create pizzeria account' : 'Create account' }}
-      </rw-button>
+        <nb-input-group>
+          <input nbInput id="register-password" [type]="showPassword.checked ? 'text' : 'password'" autocomplete="new-password" [formField]="registerForm.password" />
+          <span nbInputSuffix>
+            <label class="password-toggle" [attr.aria-label]="showPassword.checked ? 'Hide password' : 'Show password'">
+              <input #showPassword type="checkbox" class="password-toggle__checkbox" (change)="(void 0)" />
+              <img [src]="showPassword.checked ? '/icons/visibility-off.svg' : '/icons/visibility.svg'" width="24" height="24" alt="" aria-hidden="true" />
+            </label>
+          </span>
+        </nb-input-group>
+        @if (!(registerForm.password().touched() && registerForm.password().errors().length)) {
+          <span class="field__hint">At least 8 characters</span>
+        }
+        @if (registerForm.password().touched() && registerForm.password().errors().length) {
+          <span class="field__error" role="alert">{{ registerForm.password().errors()[0].message }}</span>
+        }
+      </div>
+      <div class="field" [class.field--error]="registerForm.confirmPassword().touched() && registerForm.confirmPassword().errors().length">
+        <label nbLabel for="register-confirm-password" class="field__label">
+          Confirm Password
+          @if (registerForm.confirmPassword().required()) {
+            <span class="field__required" aria-hidden="true">*</span>
+          }
+        </label>
+        <nb-input-group>
+          <input nbInput id="register-confirm-password" [type]="showConfirmPassword.checked ? 'text' : 'password'" autocomplete="new-password" [formField]="registerForm.confirmPassword" />
+          <span nbInputSuffix>
+            <label class="password-toggle" [attr.aria-label]="showConfirmPassword.checked ? 'Hide confirm password' : 'Show confirm password'">
+              <input #showConfirmPassword type="checkbox" class="password-toggle__checkbox" (change)="(void 0)" />
+              <img [src]="showConfirmPassword.checked ? '/icons/visibility-off.svg' : '/icons/visibility.svg'" width="24" height="24" alt="" aria-hidden="true" />
+            </label>
+          </span>
+        </nb-input-group>
+        @if (registerForm.confirmPassword().touched() && registerForm.confirmPassword().errors().length) {
+          <span class="field__error" role="alert">{{ registerForm.confirmPassword().errors()[0].message }}</span>
+        }
+      </div>
+      <button nbButton type="submit" [disabled]="registerForm().submitting()" [fullWidth]="true">
+        @if (registerForm().submitting()) {
+          <span class="btn-spinner"></span>
+          <span class="sr-only">Creating account…</span>
+        } @else {
+          {{ registerAsPizzeriaOwner() ? 'Create pizzeria account' : 'Create account' }}
+        }
+      </button>
     </form>
 
     <p class="auth-card__footer">

@@ -2,14 +2,6 @@
    CSS Reset — opinionated minimal reset for modern browsers
    ========================================================================= */
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
 html {
   font-size: 16px;
   -webkit-text-size-adjust: 100%;
@@ -26,12 +18,6 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Remove list styles when list has role="list" (for accessibility-aware resets) */
-ul[role='list'],
-ol[role='list'] {
-  list-style: none;
-}
-
 /* Improve media defaults */
 img,
 picture,
@@ -40,14 +26,6 @@ canvas,
 svg {
   display: block;
   max-width: 100%;
-}
-
-/* Inherit fonts for inputs and buttons */
-input,
-button,
-textarea,
-select {
-  font: inherit;
 }
 
 /* Avoid text overflow */
@@ -74,27 +52,9 @@ h6 {
   color: var(--color-text);
 }
 
-/* Links */
-a {
-  color: var(--color-primary);
-  text-decoration: none;
-}
-
-a:hover {
-  text-decoration: underline;
-}
-
-a:focus-visible {
-  outline: 2px solid var(--color-primary);
-  outline-offset: 2px;
-  border-radius: var(--radius-sm);
-}
-
 /* Buttons reset */
 button {
   cursor: pointer;
-  border: none;
-  background: none;
 }
 
 button:disabled {

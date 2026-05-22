@@ -236,18 +236,6 @@
   text-align: center;
 }
 
-.guest-checkout-notice__register {
-  font-size: var(--text-sm);
-  color: var(--color-primary);
-  font-weight: var(--font-weight-medium);
-  text-align: center;
-  text-decoration: none;
-}
-
-.guest-checkout-notice__register:hover {
-  text-decoration: underline;
-}
-
 .btn--full {
   display: flex;
   flex-direction: column;

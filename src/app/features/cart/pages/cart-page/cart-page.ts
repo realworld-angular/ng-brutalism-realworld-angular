@@ -4,7 +4,7 @@ import { NgOptimizedImage, DecimalPipe } from '@angular/common';
 import { Title } from '@angular/platform-browser';
 import { CartStore } from '../../cart.store';
 import { Auth } from '../../../../core/services/auth';
-import { Button } from '../../../../shared/components/button/button';
+import { NbButton } from '@ng-brutalism/ui';
 import { EmptyState } from '../../../../shared/components/empty-state/empty-state';
 import { Spinner } from '../../../../shared/components/spinner/spinner';
 import { CatalogImageUrlPipe } from '../../../../shared/pipes/catalog-image-url.pipe';
@@ -15,7 +15,7 @@ import { CatalogImageUrlPipe } from '../../../../shared/pipes/catalog-image-url.
     RouterLink,
     NgOptimizedImage,
     DecimalPipe,
-    Button,
+    NbButton,
     EmptyState,
     Spinner,
     CatalogImageUrlPipe,

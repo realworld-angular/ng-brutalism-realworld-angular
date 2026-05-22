@@ -1,8 +1,6 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { DIALOG_DATA, DialogRef } from '@angular/cdk/dialog';
-import { Modal } from '../modal/modal';
-import { ModalFooter } from '../modal/modal-footer';
-import { Button } from '../button/button';
+import { ChangeDetectionStrategy, Component, ViewChild, signal } from '@angular/core';
+import { NbDialog, NbDialogContent, NbDialogActions } from '@ng-brutalism/ui';
+import { NbButton } from '@ng-brutalism/ui';
 
 export interface ConfirmDialogData {
   title: string;
@@ -15,20 +13,38 @@ export type ConfirmDialogResult = 'confirmed' | 'dismissed';
 
 @Component({
   selector: 'rw-confirm-dialog',
-  imports: [Modal, ModalFooter, Button],
+  imports: [NbDialog, NbDialogContent, NbDialogActions, NbButton],
   templateUrl: './confirm-dialog.html',
-  styleUrl: './confirm-dialog.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ConfirmDialog {
-  private readonly dialogRef = inject(DialogRef<ConfirmDialogResult>);
-  public readonly data = inject<ConfirmDialogData>(DIALOG_DATA);
+  @ViewChild(NbDialog) private readonly dialog!: NbDialog;
 
-  protected dismiss(): void {
-    this.dialogRef.close('dismissed');
+  protected readonly title = signal('');
+  protected readonly message = signal('');
+  protected readonly confirmLabel = signal('Confirm');
+  protected readonly cancelLabel = signal('Cancel');
+
+  private resolve: ((result: ConfirmDialogResult) => void) | null = null;
+
+  open(data: ConfirmDialogData): Promise<ConfirmDialogResult> {
+    this.title.set(data.title);
+    this.message.set(data.message ?? '');
+    this.confirmLabel.set(data.confirmLabel ?? 'Confirm');
+    this.cancelLabel.set(data.cancelLabel ?? 'Cancel');
+    this.dialog.open();
+    return new Promise<ConfirmDialogResult>((resolve) => {
+      this.resolve = resolve;
+    });
   }
 
   protected confirm(): void {
-    this.dialogRef.close('confirmed');
+    this.resolve?.('confirmed');
+    this.dialog.close();
+  }
+
+  protected dismiss(): void {
+    this.resolve?.('dismissed');
+    this.dialog.close();
   }
 }

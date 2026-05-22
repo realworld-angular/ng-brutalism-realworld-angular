@@ -40,6 +40,7 @@
         <div class="toolbar-row">
           <label for="pizza-name-search" class="sr-only">Search pizzas by name</label>
           <input
+            nbInput
             id="pizza-name-search"
             type="search"
             class="pizza-menu-search__input"
@@ -80,7 +81,7 @@
           <ul class="pizza-grid" role="list">
             @for (pizza of pizzas; track pizza.id) {
               <li>
-                <div class="pizza-card">
+                <nb-card>
                   <div class="pizza-card__image-wrap">
                     <img
                       [ngSrc]="pizza.image | catalogImageUrl: 'pizza'"
@@ -91,24 +92,26 @@
                       disableOptimizedSrcset
                     />
                   </div>
-                  <div class="pizza-card__body">
-                    <span class="pizza-card__name">{{ pizza.name }}</span>
-                    <div class="pizza-card__footer">
-                      <span class="pizza-card__price">
-                        from <strong>€{{ pizza.basePrice | number: '1.2-2' }}</strong>
-                      </span>
-
-                      <rw-button
+                  <nb-card-header>
+                    <nb-card-title>{{ pizza.name }}</nb-card-title>
+                  </nb-card-header>
+                  <nb-card-footer>
+                    <span class="pizza-card__price">
+                      from <strong>€{{ pizza.basePrice | number: '1.2-2' }}</strong>
+                    </span>
+                    <nb-card-actions>
+                      <button
+                        nbButton variant="neutral"
                         *rwRole="['CUSTOMER', 'GUEST']"
                         type="button"
                         size="sm"
                         (click)="openOrderModal(pizza)"
                       >
                         Add to cart
-                      </rw-button>
-                    </div>
-                  </div>
-                </div>
+                      </button>
+                    </nb-card-actions>
+                  </nb-card-footer>
+                </nb-card>
               </li>
             }
           </ul>
@@ -118,12 +121,14 @@
   </section>
 }
 
+<rw-pizza-order-form-dialog />
+
 @if (addedToCartBannerVisible()) {
   <div class="cart-added-banner" role="status" aria-live="polite" aria-atomic="true">
     <div class="cart-added-banner__inner container">
       <span class="cart-added-banner__message">Added to your cart.</span>
       <div class="cart-added-banner__actions">
-        <a routerLink="/cart" class="cart-added-banner__link">View cart</a>
+        <a nbButton variant="neutral" routerLink="/cart">View cart</a>
         <button
           type="button"
           class="cart-added-banner__dismiss"

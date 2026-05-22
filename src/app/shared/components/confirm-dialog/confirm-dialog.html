@@ -1,13 +1,16 @@
-<rw-modal [title]="data.title">
-  @if (data.message) {
-    <p class="confirm-dialog__message">{{ data.message }}</p>
-  }
-  <rw-modal-footer class="confirm-dialog__footer">
-    <rw-button type="button" variant="ghost" palette="secondary" (click)="dismiss()">
-      {{ data.cancelLabel ?? 'Cancel' }}
-    </rw-button>
-    <rw-button type="button" [palette]="'danger'" (click)="confirm()">
-      {{ data.confirmLabel ?? 'Confirm' }}
-    </rw-button>
-  </rw-modal-footer>
-</rw-modal>
+<nb-dialog>
+  <nb-dialog-content>
+    <h2 class="text-lg font-bold">{{ title() }}</h2>
+    @if (message()) {
+      <p class="mt-2 text-sm text-gray-600">{{ message() }}</p>
+    }
+  </nb-dialog-content>
+  <nb-dialog-actions>
+    <button nbButton variant="default" type="button" (click)="dismiss()" style="--nb-button-bg: transparent; --nb-button-border: transparent">
+      {{ cancelLabel() }}
+    </button>
+    <button nbButton variant="danger" type="button" (click)="confirm()">
+      {{ confirmLabel() }}
+    </button>
+  </nb-dialog-actions>
+</nb-dialog>

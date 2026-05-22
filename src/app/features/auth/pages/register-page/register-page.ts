@@ -12,12 +12,11 @@ import {
 } from '@angular/forms/signals';
 import { Auth } from '../../../../core/services/auth';
 import { Callout } from '../../../../shared/components/callout/callout';
-import { Input } from '../../../../shared/components/input/input';
-import { Button } from '../../../../shared/components/button/button';
+import { NbButton, NbInput, NbLabel, NbInputGroup, NbInputSuffix } from '@ng-brutalism/ui';
 
 @Component({
   selector: 'rw-register-page',
-  imports: [RouterLink, FormField, Input, Button, Callout, FormRoot],
+  imports: [RouterLink, FormField, NbButton, NbInput, NbLabel, NbInputGroup, NbInputSuffix, Callout, FormRoot],
   templateUrl: './register-page.html',
   styleUrl: './register-page.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

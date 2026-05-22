@@ -8,35 +8,35 @@
     <nav class="nav" aria-label="Main navigation">
       @if (!auth.isAdmin()) {
         <a
+          nbButton variant="neutral"
           routerLink="/"
           routerLinkActive="nav__link--active"
           [routerLinkActiveOptions]="{ exact: true }"
-          class="nav__link"
           >Pizzerias</a
         >
       }
 
       <a
+        nbButton variant="neutral"
         *rwRole="'CUSTOMER'"
         routerLink="/orders"
         routerLinkActive="nav__link--active"
-        class="nav__link"
         >My Orders</a
       >
 
       <a
+        nbButton variant="neutral"
         *rwRole="'PIZZERIA_ADMIN'"
         routerLink="/pizzerias/admin"
         routerLinkActive="nav__link--active"
-        class="nav__link"
         >My Pizzeria</a
       >
 
       <a
+        nbButton variant="neutral"
         *rwRole="'PIZZERIA_ADMIN'"
         routerLink="/orders"
         routerLinkActive="nav__link--active"
-        class="nav__link"
         >Orders</a
       >
     </nav>
@@ -65,12 +65,14 @@
 
       <ng-container *rwRole="['CUSTOMER', 'PIZZERIA_ADMIN']; else guestActionsTpl">
         <a routerLink="/profile" class="user-menu" aria-label="Profile for {{ auth.user()?.name }}">
-          <rw-avatar [name]="auth.user()!.name" size="sm" />
+          <nb-avatar class="size-8" aria-label="Avatar for {{ auth.user()!.name }}">
+            <span class="text-xs font-bold">{{ getInitials(auth.user()!.name) }}</span>
+          </nb-avatar>
         </a>
       </ng-container>
       <ng-template #guestActionsTpl>
-        <a routerLink="/auth/login" class="nav__link hide-on-mobile">Log in</a>
-        <a routerLink="/auth/register" class="btn-nav-primary hide-on-mobile">Join</a>
+        <a nbButton variant="neutral" routerLink="/auth/login" class="hide-on-mobile">Log in</a>
+        <a nbButton routerLink="/auth/register" class="hide-on-mobile">Join</a>
       </ng-template>
 
       <!-- Mobile hamburger -->
@@ -112,35 +114,35 @@
       <div class="container mobile-menu__body">
         <div class="mobile-menu__links">
           @if (!auth.isAdmin()) {
-            <a routerLink="/" class="mobile-menu__link" (click)="closeMobileMenu()">Pizzerias</a>
+            <a nbButton variant="neutral" routerLink="/" (click)="closeMobileMenu()">Pizzerias</a>
           }
 
           <a
+            nbButton variant="neutral"
             *rwRole="'CUSTOMER'"
             routerLink="/orders"
-            class="mobile-menu__link"
             (click)="closeMobileMenu()"
             >My Orders</a
           >
 
           <a
+            nbButton variant="neutral"
             *rwRole="'PIZZERIA_ADMIN'"
             routerLink="/pizzerias/admin"
-            class="mobile-menu__link"
             (click)="closeMobileMenu()"
             >My Pizzeria</a
           >
 
           <a
+            nbButton variant="neutral"
             *rwRole="'PIZZERIA_ADMIN'"
             routerLink="/orders"
-            class="mobile-menu__link"
             (click)="closeMobileMenu()"
             >Orders</a
           >
 
           @if (!auth.isAdmin()) {
-            <a routerLink="/cart" class="mobile-menu__link" (click)="closeMobileMenu()">
+            <a nbButton variant="neutral" routerLink="/cart" (click)="closeMobileMenu()">
               Cart
               @if (cartStore.itemCount() > 0) {
                 <span class="cart-link__badge" aria-hidden="true">{{ cartStore.itemCount() }}</span>
@@ -149,9 +151,7 @@
           }
 
           <ng-container *rwRole="['CUSTOMER', 'PIZZERIA_ADMIN']">
-            <a routerLink="/profile" class="mobile-menu__link" (click)="closeMobileMenu()"
-              >Profile</a
-            >
+            <a nbButton variant="neutral" routerLink="/profile" (click)="closeMobileMenu()">Profile</a>
           </ng-container>
         </div>
 
@@ -161,14 +161,14 @@
             <p class="mobile-menu__auth-subtitle">Log in to your account or create a new one.</p>
             <div class="mobile-menu__auth-actions">
               <a
+                nbButton variant="neutral"
                 routerLink="/auth/login"
-                class="mobile-menu__auth-btn mobile-menu__auth-btn--secondary"
                 (click)="closeMobileMenu()"
                 >Log in</a
               >
               <a
+                nbButton
                 routerLink="/auth/register"
-                class="mobile-menu__auth-btn mobile-menu__auth-btn--primary"
                 (click)="closeMobileMenu()"
                 >Join</a
               >

@@ -9,5 +9,5 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HeroBanner {
-  public readonly editionVariant = 'Starter';
+  public readonly editionVariant = 'NG-Brutalism';
 }

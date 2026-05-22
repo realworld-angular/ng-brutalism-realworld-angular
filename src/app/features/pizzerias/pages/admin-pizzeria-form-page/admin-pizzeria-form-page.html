@@ -17,9 +17,14 @@
       />
 
       <div class="form-actions">
-        <rw-button type="submit" [isLoading]="pizzeriaForm().submitting()">
-          Create pizzeria
-        </rw-button>
+        <button nbButton variant="neutral" type="submit" [disabled]="pizzeriaForm().submitting()">
+          @if (pizzeriaForm().submitting()) {
+            <span class="btn-spinner"></span>
+            <span class="sr-only">Creating…</span>
+          } @else {
+            Create pizzeria
+          }
+        </button>
       </div>
     </form>
   </div>

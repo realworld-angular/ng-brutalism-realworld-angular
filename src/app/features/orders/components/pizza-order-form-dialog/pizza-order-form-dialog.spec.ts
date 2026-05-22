@@ -10,7 +10,7 @@ import { CatalogImageUrlPipe } from '../../../../shared/pipes/catalog-image-url.
 import { FormField, FormRoot } from '@angular/forms/signals';
 import { Button } from '../../../../shared/components/button/button';
 import { Modal } from '../../../../shared/components/modal/modal';
-import { Input } from '../../../../shared/components/input/input';
+import { NbInput } from '@ng-brutalism/ui';
 import { Spinner } from '../../../../shared/components/spinner/spinner';
 import { SizeOptionField } from '../pizza-size-option-field/pizza-size-option-field';
 
@@ -55,7 +55,7 @@ describe('PizzaOrderFormDialog', () => {
           Modal,
           Spinner,
           Button,
-          Input,
+          NbInput,
           SizeOptionField,
           FormRoot,
           FormField,

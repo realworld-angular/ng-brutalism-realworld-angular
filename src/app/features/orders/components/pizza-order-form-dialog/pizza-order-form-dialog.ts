@@ -5,17 +5,15 @@ import {
   effect,
   inject,
   signal,
+  ViewChild,
 } from '@angular/core';
 import { DecimalPipe, NgOptimizedImage } from '@angular/common';
 import { httpResource } from '@angular/common/http';
-import { DialogRef, DIALOG_DATA } from '@angular/cdk/dialog';
-import { form, FormField, FormRoot, min, required } from '@angular/forms/signals';
+import { form, FormField, FormRoot, min, required, submit } from '@angular/forms/signals';
+import { NbDialog, NbDialogContent, NbDialogActions, NbButton, NbInput, NbTitle } from '@ng-brutalism/ui';
 import { CartStore } from '../../../cart/cart.store';
-import { PizzaOption } from '../../../pizzerias/models/pizza.models';
+import { Pizza, PizzaOption } from '../../../pizzerias/models/pizza.models';
 import { PizzaOrderFormDialogData } from '../../order.models';
-import { Button } from '../../../../shared/components/button/button';
-import { Modal } from '../../../../shared/components/modal/modal';
-import { Input } from '../../../../shared/components/input/input';
 import { CatalogImageUrlPipe } from '../../../../shared/pipes/catalog-image-url.pipe';
 import { SizeOptionField } from '../pizza-size-option-field/pizza-size-option-field';
 import { Spinner } from '../../../../shared/components/spinner/spinner';
@@ -29,16 +27,8 @@ interface PizzaOrderFormModel {
 @Component({
   selector: 'rw-pizza-order-form-dialog',
   imports: [
-    Modal,
-    DecimalPipe,
-    NgOptimizedImage,
-    Button,
-    CatalogImageUrlPipe,
-    FormField,
-    FormRoot,
-    Input,
-    SizeOptionField,
-    Spinner,
+    NbDialog, NbDialogContent, NbDialogActions, NbButton, NbTitle,
+    DecimalPipe, NgOptimizedImage, CatalogImageUrlPipe, FormField, FormRoot, NbInput, SizeOptionField, Spinner,
   ],
   templateUrl: './pizza-order-form-dialog.html',
   styleUrl: './pizza-order-form-dialog.css',
@@ -46,8 +36,11 @@ interface PizzaOrderFormModel {
 })
 export class PizzaOrderFormDialog {
   private readonly cartStore = inject(CartStore);
-  private readonly dialogRef = inject(DialogRef);
-  protected readonly data = inject<PizzaOrderFormDialogData>(DIALOG_DATA);
+  @ViewChild(NbDialog) private readonly dialog!: NbDialog;
+
+  protected readonly data = signal<PizzaOrderFormDialogData | null>(null);
+
+  private resolve: ((result: string | undefined) => void) | null = null;
 
   protected readonly sizesResource = httpResource<PizzaOption[]>(() => '/api/options/sizes', {
     defaultValue: [],
@@ -56,9 +49,7 @@ export class PizzaOrderFormDialog {
     defaultValue: [],
   });
 
-  public readonly defaultToppings = this.data.pizza.toppings
-    .map((topping) => topping.label)
-    .join(', ');
+  protected readonly defaultToppings = signal('');
 
   protected readonly model = signal<PizzaOrderFormModel>({
     selectedSize: null,
@@ -76,13 +67,13 @@ export class PizzaOrderFormDialog {
     {
       submission: {
         action: async (form) => {
-          if (this.cartStore.hasItemsForOtherPizzeria(this.data.pizzeriaId)) {
+          if (this.cartStore.hasItemsForOtherPizzeria(this.data()!.pizzeriaId)) {
             this.cartStore.clear();
           }
 
           const { selectedSize, extraToppings, quantity } = form().value();
           this.cartStore.addItem(
-            this.data.pizza.id,
+            this.data()!.pizza.id,
             Number(quantity),
             selectedSize?.id ?? null,
             extraToppings
@@ -90,9 +81,10 @@ export class PizzaOrderFormDialog {
                 selected ? this.toppingsResource.value()![index].id : null,
               )
               .filter((t): t is string => t !== null),
-            this.data.pizzeriaId,
+            this.data()!.pizzeriaId,
           );
-          this.dialogRef.close('added');
+          this.resolve?.('added');
+          this.dialog.close();
           return null;
         },
       },
@@ -101,7 +93,8 @@ export class PizzaOrderFormDialog {
 
   protected readonly modalTotal = computed<number>(() => {
     const { selectedSize, extraToppings, quantity } = this.orderForm().value();
-    const pizza = this.data.pizza;
+    const pizza = this.data()?.pizza;
+    if (!pizza) return 0;
     const sizePrice = selectedSize?.price ?? 0;
     const toppingsPrice = extraToppings.reduce(
       (sum, topping, index) => sum + (topping ? this.toppingsResource.value()![index].price : 0),
@@ -113,13 +106,36 @@ export class PizzaOrderFormDialog {
   public constructor() {
     effect(() => {
       const toppings = this.toppingsResource.value();
-      if (toppings) {
+      if (toppings && this.data()) {
         this.model.update((m) => ({
           ...m,
           extraToppings: toppings.map(() => false),
         }));
       }
     });
+  }
+
+  open(data: PizzaOrderFormDialogData): Promise<string | undefined> {
+    this.data.set(data);
+    this.defaultToppings.set(data.pizza.toppings.map((t) => t.label).join(', '));
+    this.model.set({
+      selectedSize: null,
+      extraToppings: [],
+      quantity: 1,
+    });
+    this.dialog.open();
+    return new Promise((resolve) => {
+      this.resolve = resolve;
+    });
+  }
+
+  protected save(): void {
+    void submit(this.orderForm);
+  }
+
+  protected dismiss(): void {
+    this.resolve?.(undefined);
+    this.dialog.close();
   }
 
   protected decrementQuantity(): void {
